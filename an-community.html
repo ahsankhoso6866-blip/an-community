@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AN Community</title>
+<style>
+  :root{
+    --indigo:#1B3B5F; --indigo-dark:#122840;
+    --maroon:#8C2F39; --sand:#F3EFE4; --ink:#24303A;
+    --muted:#6B7280; --line:#E2DCCB; --green:#2F855A; --white:#FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,Roboto,Segoe UI,sans-serif;background:var(--sand);color:var(--ink);}
+  .screen{display:none;min-height:100vh;padding-bottom:70px;}
+  .screen.active{display:block;}
+  .top{background:var(--indigo);color:#fff;padding:18px 16px;}
+  .top h1{font-size:20px;font-weight:700;}
+  .top p{font-size:13px;opacity:.85;margin-top:2px;}
+  .wrap{padding:16px;}
+  input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;
+    background:#fff;font-size:15px;margin-bottom:12px;color:var(--ink);}
+  textarea{resize:vertical;min-height:70px;}
+  label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px;}
+  button.btn{width:100%;padding:13px;border:none;border-radius:8px;background:var(--maroon);
+    color:#fff;font-size:15px;font-weight:600;}
+  button.btn.secondary{background:transparent;color:var(--indigo);border:1px solid var(--indigo);}
+  .link{color:var(--indigo);text-align:center;display:block;margin-top:14px;font-size:14px;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px;}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px;}
+  .cat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 6px;text-align:center;
+    font-size:12px;font-weight:600;color:var(--ink);}
+  .cat .ico{font-size:26px;display:block;margin-bottom:6px;}
+  .postcard h3{font-size:16px;margin-bottom:4px;}
+  .postcard .price{color:var(--maroon);font-weight:700;font-size:15px;margin:4px 0;}
+  .postcard .meta{font-size:12px;color:var(--muted);margin-bottom:8px;}
+  .row{display:flex;gap:8px;}
+  .row a{flex:1;text-align:center;padding:9px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;}
+  .call{background:var(--indigo);color:#fff;}
+  .wa{background:var(--green);color:#fff;}
+  .fab{position:fixed;bottom:80px;right:18px;width:54px;height:54px;border-radius:50%;
+    background:var(--maroon);color:#fff;border:none;font-size:26px;box-shadow:0 4px 10px rgba(0,0,0,.25);}
+  .bottomnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
+    display:flex;}
+  .bottomnav div{flex:1;text-align:center;padding:10px 0;font-size:11px;color:var(--muted);}
+  .bottomnav div.active{color:var(--maroon);font-weight:700;}
+  .backbar{display:flex;align-items:center;gap:10px;}
+  .backbar span{font-size:20px;cursor:pointer;}
+  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:20;}
+  .modal.active{display:flex;align-items:flex-end;}
+  .modal-inner{background:#fff;width:100%;border-radius:16px 16px 0 0;padding:18px;max-height:85vh;overflow:auto;}
+  .empty{text-align:center;color:var(--muted);padding:40px 16px;font-size:14px;}
+  .postAction{flex:1;text-align:center;padding:8px 2px;border-radius:8px;font-size:12px;font-weight:600;
+    text-decoration:none;background:var(--sand);color:var(--ink);border:1px solid var(--line);white-space:nowrap;}
+  .checkbox-row{display:flex;align-items:flex-start;gap:8px;margin:14px 0;}
+  .checkbox-row input{width:auto;margin:3px 0 0;}
+  .rules-text{font-size:13px;color:var(--ink);line-height:1.6;background:#fff;border:1px solid var(--line);
+    border-radius:8px;padding:14px;max-height:260px;overflow:auto;}
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div class="screen active" id="authScreen">
+  <div class="top"><h1>AN Community</h1><p>Apne ilaqe ki apni community</p></div>
+  <div class="wrap">
+    <div id="loginBox">
+      <label>Mobile Number</label>
+      <input id="loginMobile" placeholder="03XXXXXXXXX">
+      <label>Password</label>
+      <input id="loginPass" type="password" placeholder="Password">
+      <button class="btn" onclick="doLogin()">Login</button>
+      <span class="link" onclick="toggleAuth()">Naya account banayein — Sign Up</span>
+    </div>
+    <div id="signupBox" style="display:none;">
+      <label>Poora Naam</label>
+      <input id="suName" placeholder="Aapka naam">
+      <label>Mobile Number</label>
+      <input id="suMobile" placeholder="03XXXXXXXXX">
+      <label>Password</label>
+      <input id="suPass" type="password" placeholder="Password">
+      <label>District</label>
+      <select id="suDistrict" onchange="fillTalukas()">
+        <option value="Jamshoro">Jamshoro</option>
+      </select>
+      <label>Taluka</label>
+      <select id="suTaluka" onchange="fillUCs()"><option value="">-- Taluka chunein --</option></select>
+      <label>Union Council (UC)</label>
+      <select id="suUC"><option value="">-- UC chunein --</option></select>
+      <label>Village / Mohalla</label>
+      <input id="suVillage" placeholder="Apna gaon/mohalla likhein">
+      <button class="btn" onclick="doSignup()">Sign Up</button>
+      <span class="link" onclick="toggleAuth()">Pehle se account hai? Login</span>
+    </div>
+    <p id="authMsg" style="color:var(--maroon);font-size:13px;margin-top:8px;"></p>
+  </div>
+</div>
+
+<!-- RULES SCREEN -->
+<div class="screen" id="rulesScreen">
+  <div class="top"><h1>سنڌي اصول</h1></div>
+  <div class="wrap">
+    <div class="rules-text" dir="rtl" style="text-align:right;font-size:15px;">
+      ۱. رڳو صحيح ۽ سچي معلومات پوسٽ ڪريو.<br>
+      ۲. ڪنهن سان دوکو، فراڊ يا ڪوڙي خبر پکيڙڻ منع آهي.<br>
+      ۳. عزت سان ڳالهايو، گاريون يا بدتميزي واري ٻولي منع آهي.<br>
+      ۴. خريداري يا وڪري جو معاملو رڳو استعمال ڪندڙ جي پنهنجي ذميواري آهي — AN Community ان جو حصو ناهي.<br>
+      ۵. ايمرجنسي/مدد واري حصي ۾ رڳو حقيقي ايمرجنسي پوسٽ ڪريو.<br>
+      ۶. غلط پوسٽ يا پروفائل جي رپورٽ ڪري سگهجي ٿي، ايڊمن ان تي عمل ڪري سگهي ٿو.
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="agreeBox">
+      <label for="agreeBox" style="font-size:14px;">Mein in rules se ittefaq karta/karti hoon (I Agree)</label>
+    </div>
+    <button class="btn" onclick="acceptRules()">Continue</button>
+  </div>
+</div>
+
+<!-- HOME SCREEN -->
+<div class="screen" id="homeScreen">
+  <div class="top" style="position:relative;">
+    <span onclick="openNotifications()" style="position:absolute;right:16px;top:16px;font-size:24px;">🔔<b id="bellCount" style="display:none;position:absolute;top:-6px;right:-8px;background:var(--maroon);color:#fff;border-radius:10px;font-size:11px;padding:1px 6px;"></b></span>
+    <h1>AN Community</h1>
+    <p id="homeLocation">📍 Location</p>
+  </div>
+  <div class="wrap" style="padding-bottom:0;">
+    <div class="card" style="background:var(--indigo);color:#fff;text-align:center;" onclick="openExplore()">
+      <div style="font-size:17px;font-weight:700;">🌍 Explore Jamshoro</div>
+      <div style="font-size:12px;opacity:.85;margin-top:4px;">Poore Jamshoro mein kya ho raha hai, dekhein</div>
+    </div>
+  </div>
+  <div class="grid" id="catGrid"></div>
+  <div class="wrap" style="padding-bottom:0;">
+    <div class="card" id="feedNewBanner" style="display:none;background:var(--maroon);color:#fff;text-align:center;cursor:pointer;" onclick="loadFeed(true)">
+      🆕 Nayi Posts — Dekhein
+    </div>
+  </div>
+  <div class="wrap">
+    <strong>🏘️ Community Feed</strong>
+    <div id="feedList" style="margin-top:10px;"><div class="empty">Feed load ho raha hai...</div></div>
+  </div>
+  <button class="fab" onclick="openPostForm()">+</button>
+  <div class="bottomnav">
+    <div class="active" onclick="showHome()">🏠<br>Home</div>
+    <div onclick="openPostForm()">➕<br>Post</div>
+    <div onclick="openMyPosts()">📋<br>My Posts</div>
+    <div onclick="openProfile()">👤<br>Profile</div>
+  </div>
+</div>
+
+<!-- BUSINESS PROFILE FORM -->
+<div class="screen" id="bizFormScreen">
+  <div class="top"><div class="backbar"><span onclick="show('exploreScreen')">←</span><h1>🏪 Meri Business Profile</h1></div></div>
+  <div class="wrap">
+    <label>Business/Shop Naam</label><input id="bizName" placeholder="Jaise: Ahsan General Store">
+    <label>Category</label><input id="bizCategory" placeholder="Jaise: General Store, Bakery, Medical...">
+    <label>Products/Services aur Rates</label>
+    <textarea id="bizProducts" placeholder="Jaise: Chicken Rs.450/kg, Eggs Rs.320/dozen"></textarea>
+    <label>Photos (zyada se zyada 5)</label>
+    <input type="file" id="bizPhotoInput" accept="image/*" multiple onchange="onPhotoPick('biz',this)">
+    <div id="bizPhotosPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px;"></div>
+    <label>Khulne ka waqt</label><input id="bizOpen" placeholder="Jaise: 8:00 AM">
+    <label>Band hone ka waqt</label><input id="bizClose" placeholder="Jaise: 10:00 PM">
+    <label>Delivery Available?</label>
+    <select id="bizDelivery"><option value="No">No</option><option value="Yes">Yes</option></select>
+    <label>Contact Number</label><input id="bizContact" placeholder="03XXXXXXXXX">
+    <label>WhatsApp Number (agar alag ho)</label><input id="bizWa" placeholder="03XXXXXXXXX">
+    <div id="bizUploadStatus" style="font-size:12px;color:var(--muted);margin-bottom:8px;"></div>
+    <button class="btn" id="bizSaveBtn" onclick="saveBusiness()">Save Business Profile</button>
+  </div>
+</div>
+
+<!-- WORKER PROFILE FORM -->
+<div class="screen" id="workerFormScreen">
+  <div class="top"><div class="backbar"><span onclick="show('exploreScreen')">←</span><h1>👷 Meri Worker Profile</h1></div></div>
+  <div class="wrap">
+    <label>Naam</label><input id="wkName" placeholder="Aapka naam">
+    <label>Kaam ki Qisam</label>
+    <select id="wkType">
+      <option>Raj Mistri/Mason</option><option>Plumber</option><option>Electrician</option>
+      <option>Carpenter</option><option>Painter</option><option>Tile Worker</option>
+      <option>AC Technician</option><option>General Labour</option><option>Other</option>
+    </select>
+    <label>Experience</label><input id="wkExp" placeholder="Jaise: 5 saal">
+    <label>Availability</label>
+    <select id="wkAvail">
+      <option value="Free — Kaam le sakta hoon">ابھی فارغ ہوں</option>
+      <option value="Busy">ابھی مصروف ہوں</option>
+      <option value="Available Soon">2 دن بعد فارغ ہوں</option>
+    </select>
+    <label>Description</label><textarea id="wkDesc" placeholder="Apne kaam ke baare mein likhein"></textarea>
+    <label>Contact Number</label><input id="wkContact" placeholder="03XXXXXXXXX">
+    <label>WhatsApp Number (agar alag ho)</label><input id="wkWa" placeholder="03XXXXXXXXX">
+    <button class="btn" onclick="saveWorker()">Save Worker Profile</button>
+  </div>
+</div>
+
+<!-- PROFILE EDIT SCREEN -->
+<div class="screen" id="profileEditScreen">
+  <div class="top"><div class="backbar"><span onclick="openProfile()">←</span><h1>✏️ Profile Edit</h1></div></div>
+  <div class="wrap">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+      <div id="peAvatar"></div>
+      <div style="flex:1;">
+        <input type="file" id="peFile" accept="image/*" onchange="onPePhoto(this)" style="margin-bottom:6px;">
+        <span class="link" style="margin:0;text-align:left;" onclick="removePePhoto()">Photo hatayen</span>
+      </div>
+    </div>
+    <label>Poora Naam</label><input id="peName" placeholder="Aapka naam">
+    <label>About / Bio (public)</label><textarea id="peBio" maxlength="200" placeholder="Apne baare mein chand alfaaz"></textarea>
+    <label>Taluka</label><select id="peTaluka" onchange="peTalukaChanged()"></select>
+    <label>Union Council (UC)</label><select id="peUC"></select>
+    <label>Village / Mohalla</label><input id="peVillage" placeholder="Apna gaon/mohalla">
+    <button class="btn" onclick="saveProfile()">Save Profile</button>
+  </div>
+</div>
+
+<!-- PRIVATE DETAILS SCREEN -->
+<div class="screen" id="privateScreen">
+  <div class="top"><div class="backbar"><span onclick="openProfile()">←</span><h1>🔒 Personal Details</h1></div></div>
+  <div class="wrap">
+    <div class="card" style="font-size:13px;color:var(--muted);">Ye details sirf aap ko dikhti hain. Ye aap ki public profile par nazar nahi aatin.</div>
+    <label>Login Number (badla nahi ja sakta)</label>
+    <div class="card" id="pvLogin" style="margin-bottom:12px;">-</div>
+    <label>Meri Contact Phone (private)</label><input id="pvPhone" placeholder="03XXXXXXXXX">
+    <label>Meri WhatsApp Number (private)</label><input id="pvWa" placeholder="03XXXXXXXXX">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Ye numbers nayi post/profile banate waqt khud bhar diye jate hain. Post mein jo number aap rakhte hain wahi logon ko Call/WhatsApp ke liye dikhta hai.</div>
+    <button class="btn" onclick="savePrivate()">Save</button>
+  </div>
+</div>
+
+<!-- COMMENTS SCREEN -->
+<div class="screen" id="commentsScreen">
+  <div class="top"><div class="backbar"><span onclick="showHome()">←</span><h1>💬 Comments</h1></div></div>
+  <div class="wrap" id="commentsPostBox"></div>
+  <div class="wrap" id="commentsList"></div>
+  <div class="wrap" style="position:sticky;bottom:0;background:var(--sand);padding-top:8px;padding-bottom:16px;">
+    <div style="display:flex;gap:8px;align-items:flex-start;">
+      <input id="commentInput" placeholder="Comment likhein...">
+      <button class="btn" style="width:auto;padding:12px 16px;margin:0;" onclick="submitComment()">Bhejain</button>
+    </div>
+  </div>
+</div>
+
+<!-- SAVED POSTS SCREEN -->
+<div class="screen" id="savedScreen">
+  <div class="top"><div class="backbar"><span onclick="openProfile()">←</span><h1>🔖 Saved Posts</h1></div></div>
+  <div class="wrap" id="savedList"></div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="modal" id="reportModal">
+  <div class="modal-inner">
+    <div class="backbar" style="margin-bottom:12px;"><span onclick="closeReportModal()">✕</span><strong>Post Report Karein</strong></div>
+    <div class="checkbox-row"><input type="radio" name="reportReason" value="Fake/Fraud" checked><label>Fake/Fraud</label></div>
+    <div class="checkbox-row"><input type="radio" name="reportReason" value="Spam"><label>Spam</label></div>
+    <div class="checkbox-row"><input type="radio" name="reportReason" value="Abusive"><label>Abusive / Gaali-galoch</label></div>
+    <div class="checkbox-row"><input type="radio" name="reportReason" value="Wrong Info"><label>Ghalat Maloomat</label></div>
+    <div class="checkbox-row"><input type="radio" name="reportReason" value="Other"><label>Doosri Wajah</label></div>
+    <button class="btn" onclick="submitReport()">Report Bhejain</button>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS SCREEN -->
+<div class="screen" id="notifScreen">
+  <div class="top"><div class="backbar"><span onclick="showHome()">←</span><h1>🔔 Notifications</h1></div></div>
+  <div class="wrap" id="notifList"></div>
+</div>
+
+<!-- PROFILE SCREEN -->
+<div class="screen" id="profileScreen">
+  <div class="top"><div class="backbar"><span onclick="showHome()">←</span><h1>👤 Profile</h1></div></div>
+  <div class="wrap" id="profileBody"></div>
+</div>
+
+<!-- MY POSTS SCREEN -->
+<div class="screen" id="myPostsScreen">
+  <div class="top">
+    <div class="backbar"><span onclick="showHome()">←</span><h1>📋 Meri Posts</h1></div>
+  </div>
+  <div class="wrap">
+    <div id="myPostsList"><div class="empty">Loading...</div></div>
+  </div>
+</div>
+
+<!-- EXPLORE SCREEN -->
+<div class="screen" id="exploreScreen">
+  <div class="top">
+    <div class="backbar"><span onclick="showHome()">←</span><h1>🌍 Explore Jamshoro</h1></div>
+  </div>
+  <div class="wrap">
+    <input id="exploreSearch" placeholder="Search: Electrician, Cement, Driver...">
+    <button class="btn secondary" onclick="runExploreSearch()">Jamshoro mein Search karein</button>
+    <div style="margin:14px 0 6px;font-size:13px;color:var(--muted);">Ilaqa Filter:</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;" id="talukaFilters"></div>
+  </div>
+  <div class="grid" id="exploreCatGrid"></div>
+  <div class="wrap">
+    <div id="explorePeopleList" style="margin-bottom:12px;"></div>
+    <strong id="exploreListTitle">Poora Jamshoro — Recent</strong>
+    <div id="explorePostList" style="margin-top:10px;"></div>
+  </div>
+</div>
+
+<!-- POST FORM MODAL -->
+<div class="modal" id="photoViewerModal">
+  <div class="modal-inner" style="text-align:center;">
+    <div class="backbar" style="margin-bottom:10px;justify-content:space-between;">
+      <span onclick="closePhotoViewer()">✕</span><span id="pvCounter" style="color:var(--muted);font-size:13px;"></span><span></span>
+    </div>
+    <img id="pvImage" src="" alt="" style="max-width:100%;border-radius:10px;">
+    <div class="row" style="margin-top:12px;">
+      <a class="call" href="#" onclick="pvNav(-1);return false;">← Peeche</a>
+      <a class="wa" href="#" onclick="pvNav(1);return false;">Aage →</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="postModal">
+  <div class="modal-inner">
+    <div class="backbar" style="margin-bottom:12px;">
+      <span onclick="closePostForm()">✕</span><strong id="postModalTitle">Nayi Post</strong>
+    </div>
+    <label>Category</label>
+    <select id="pCategory" onchange="updateFormFields()">
+      <option value="bazaar">🛒 Bazaar / Buy & Sell</option>
+      <option value="jobs">💼 Jobs</option>
+      <option value="property">🏘️ Property</option>
+      <option value="zameen">🌾 Zameen</option>
+      <option value="drivers">🚗 Drivers</option>
+      <option value="animals">🐄 Animals Trade</option>
+      <option value="services">🔧 Services</option>
+      <option value="laado">🙋 Zaroorat</option>
+      <option value="announcements">📢 Local Announcements</option>
+      <option value="help">🆘 Help / Emergency</option>
+      <option value="lostfound">🔎 Lost & Found</option>
+    </select>
+    <label>Title</label>
+    <input id="pTitle" placeholder="Chhota unwan">
+    <div id="pExtra1Group" style="display:none;">
+      <label id="pExtra1Label">Extra</label>
+      <select id="pExtra1Select" style="display:none;"></select>
+      <input id="pExtra1Input" style="display:none;">
+    </div>
+    <div id="pExtra2Group" style="display:none;">
+      <label id="pExtra2Label">Extra</label>
+      <select id="pExtra2Select" style="display:none;"></select>
+      <input id="pExtra2Input" style="display:none;">
+    </div>
+    <div id="pPhotosGroup" style="display:none;">
+      <label>Photos (zyada se zyada 5)</label>
+      <input type="file" id="pPhotoInput" accept="image/*" multiple onchange="onPhotoPick('p',this)">
+      <div id="pPhotosPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px;"></div>
+    </div>
+    <label>Description</label>
+    <textarea id="pDesc" placeholder="Tafseel likhein"></textarea>
+    <div id="pPriceGroup">
+      <label id="pPriceLabel">Price (agar ho to)</label>
+      <input id="pPrice" placeholder="Rs. (optional)">
+    </div>
+    <label>Contact Number</label>
+    <input id="pContact" placeholder="03XXXXXXXXX">
+    <label>WhatsApp Number (agar alag ho, warna khali)</label>
+    <input id="pWa" placeholder="03XXXXXXXXX">
+    <div id="pUploadStatus" style="font-size:12px;color:var(--muted);margin-bottom:8px;"></div>
+    <button class="btn" id="pPublishBtn" onclick="submitPost()">Publish</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ====== YAHAN APNA FIREBASE WEB CONFIG PASTE KARO ====== */
+const firebaseConfig = {
+  apiKey: "AIzaSyCOXwIrYnhCocTkT-Txz7BdBgjIhTt3sKk",
+  authDomain: "an-community-cf5eb.firebaseapp.com",
+  projectId: "an-community-cf5eb",
+  storageBucket: "an-community-cf5eb.firebasestorage.app",
+  messagingSenderId: "335074926747",
+  appId: "1:335074926747:web:f6af9de0ad358699b4663e"
+};
+/* ========================================================= */
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+function esc(t){return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+let myFollowing=null;
+let currentName="";
+let notifUnsub=null;
+let activeScreen="homeScreen";
+let editingPostId=null;
+let myPrivate={};
+let lastProfileUid=null;
+let userInfoCache={};
+let feedUnsub=null;
+let feedNewestSeen=0;
+let myLikedPosts=null, mySavedPosts=null;
+let commentsPostId=null, commentsPost=null, replyParentId=null;
+let reportPostId=null;
+let deepLinkHandled=false;
+let currentVillage = "";
+let currentTaluka = "";
+let currentCategory = "bazaar";
+let exploreTaluka = "all";
+let exploreCategory = "";
+
+const LOCATION_DATA={
+  "Jamshoro":{
+    "Manjhand":["Unarpur","Manjhand","Sann","Amri","Lakha","Kachi","Laki"],
+    "Kotri":["Kotri City-1","Kotri City-2","SITE / Labor Colony","Jamshoro Town / Sindh University","Allah Bachayo Shoro","Sonwalhar","Petaro","Chhib / Mulas"],
+    "Sehwan":["Sehwan Sharif-1","Sehwan Sharif-2","Bhan Syedabad","Arazi","Talti","Bubak","Jhangara","Channa"],
+    "Thano Bula Khan":["Thano Bula Khan","Taung","Mole","Karchat","Sari"]
+  }
+};
+function fillTalukas(){
+  const d=document.getElementById('suDistrict').value;
+  const tSel=document.getElementById('suTaluka');
+  tSel.innerHTML='<option value="">-- Taluka chunein --</option>';
+  Object.keys(LOCATION_DATA[d]||{}).forEach(t=>{tSel.innerHTML+=`<option value="${t}">${t}</option>`;});
+  document.getElementById('suUC').innerHTML='<option value="">-- UC chunein --</option>';
+}
+function fillUCs(){
+  const d=document.getElementById('suDistrict').value;
+  const t=document.getElementById('suTaluka').value;
+  const ucSel=document.getElementById('suUC');
+  ucSel.innerHTML='<option value="">-- UC chunein --</option>';
+  ((LOCATION_DATA[d]||{})[t]||[]).forEach(uc=>{ucSel.innerHTML+=`<option value="${uc}">${uc}</option>`;});
+}
+fillTalukas();
+
+function show(id){activeScreen=id;document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');}
+function toggleAuth(){
+  const l=document.getElementById('loginBox'), s=document.getElementById('signupBox');
+  l.style.display = l.style.display==='none' ? 'block':'none';
+  s.style.display = s.style.display==='none' ? 'block':'none';
+}
+function msg(t){document.getElementById('authMsg').innerText=t;}
+
+function doSignup(){
+  const name=document.getElementById('suName').value.trim();
+  const mobile=document.getElementById('suMobile').value.trim();
+  const pass=document.getElementById('suPass').value;
+  const district=document.getElementById('suDistrict').value;
+  const taluka=document.getElementById('suTaluka').value;
+  const uc=document.getElementById('suUC').value;
+  const village=document.getElementById('suVillage').value.trim();
+  if(!name||!mobile||!pass||!taluka||!uc||!village){msg("Sab fields bharein (Taluka, UC, Village bhi)");return;}
+  auth.createUserWithEmailAndPassword(mobile+"@ancommunity.local", pass)
+    .then(cred=>{
+      const ref=db.collection('users').doc(cred.user.uid);
+      return ref.set({name, district, taluka, uc, village, rulesAgreed:false})
+        .then(()=>ref.collection('private').doc('info').set({mobile}));
+    })
+    .then(()=>show('rulesScreen'))
+    .catch(e=>msg(e.message));
+}
+function doLogin(){
+  const mobile=document.getElementById('loginMobile').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  auth.signInWithEmailAndPassword(mobile+"@ancommunity.local", pass)
+    .catch(e=>msg(e.message));
+}
+function doLogout(){myFollowing=null;myPrivate={};if(notifUnsub){notifUnsub();notifUnsub=null;}if(feedUnsub){feedUnsub();feedUnsub=null;}myLikedPosts=null;mySavedPosts=null;auth.signOut();show('authScreen');}
+
+function acceptRules(){
+  if(!document.getElementById('agreeBox').checked){alert("Pehle rules se agree karein");return;}
+  const uid=auth.currentUser.uid;
+  db.collection('users').doc(uid).update({rulesAgreed:true}).then(loadHome);
+}
+
+auth.onAuthStateChanged(user=>{
+  if(user){
+    db.collection('users').doc(user.uid).get().then(doc=>{
+      const data=doc.data();
+      if(!data){return;}
+      if(data.mobile){
+        const ref=db.collection('users').doc(user.uid);
+        ref.collection('private').doc('info').set({mobile:data.mobile},{merge:true})
+          .then(()=>ref.update({mobile:firebase.firestore.FieldValue.delete()}))
+          .catch(()=>{});
+      }
+      currentTaluka=data.taluka||"";
+      currentName=data.name||"";
+      db.collection('users').doc(user.uid).collection('private').doc('info').get().then(d=>{myPrivate=d.data()||{};}).catch(()=>{});
+      currentVillage=[data.village,data.uc,data.taluka].filter(Boolean).join(", ");
+      if(data.rulesAgreed){ loadHome(); checkDeepLink(); } else { show('rulesScreen'); }
+    });
+  } else { show('authScreen'); }
+});
+
+const categories=[
+  {id:'bazaar',ico:'🛒',name:'Bazaar'},{id:'jobs',ico:'💼',name:'Jobs'},
+  {id:'property',ico:'🏘️',name:'Property'},{id:'services',ico:'🔧',name:'Services'},
+  {id:'announcements',ico:'📢',name:'Announcements'},{id:'lostfound',ico:'🔎',name:'Lost&Found'}
+];
+function loadHome(){
+  startNotifListener();
+  document.getElementById('homeLocation').innerText="📍 "+currentVillage;
+  const grid=document.getElementById('catGrid');
+  grid.innerHTML='';
+  categories.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='cat';
+    d.innerHTML=`<span class="ico">${c.ico}</span>${c.name}`;
+    d.onclick=()=>{
+      openExplore();
+      exploreCategory=c.id;
+      document.getElementById('exploreListTitle').innerText=c.name+' — Poora Jamshoro';
+      refreshExploreView();
+    };
+    grid.appendChild(d);
+  });
+  show('homeScreen');
+  loadFeed(true);
+}
+
+function loadPosts(cat){
+  const list=document.getElementById('postList');
+  list.innerHTML='<div class="empty">Loading...</div>';
+  db.collection('posts').where('category','==',cat).orderBy('createdAt','desc').limit(30)
+    .get().then(snap=>{
+      const posts=[]; snap.forEach(doc=>{const p={id:doc.id,...doc.data()}; if(!p.hidden) posts.push(p);});
+      if(!posts.length){list.innerHTML='<div class="empty">Abhi is category mein koi post nahi. Pehli post aap karein!</div>';return;}
+      list.innerHTML='';
+      posts.forEach(p=>list.appendChild(renderPostCard(p)));
+    }).catch(e=>{list.innerHTML='<div class="empty">'+esc(e.message)+'</div>';});
+}
+
+function getUserInfo(uid){
+  if(userInfoCache[uid]) return Promise.resolve(userInfoCache[uid]);
+  return db.collection('users').doc(uid).get().then(doc=>{
+    const d=doc.data()||{};
+    const info={name:d.name||'AN Community User',photo:d.photo||null,village:d.village||'',taluka:d.taluka||''};
+    userInfoCache[uid]=info; return info;
+  }).catch(()=>({name:'AN Community User',photo:null,village:'',taluka:''}));
+}
+function loadFeed(scrollTop){
+  const banner=document.getElementById('feedNewBanner'); if(banner) banner.style.display='none';
+  const list=document.getElementById('feedList');
+  if(!list) return;
+  list.innerHTML='<div class="empty">Feed load ho raha hai...</div>';
+  db.collection('posts').orderBy('createdAt','desc').limit(30).get().then(snap=>{
+    const posts=[]; snap.forEach(doc=>{const p={id:doc.id,...doc.data()}; if(!p.hidden) posts.push(p);});
+    if(posts.length) feedNewestSeen=posts[0].createdAt?.seconds||feedNewestSeen;
+    if(!posts.length){list.innerHTML='<div class="empty">Abhi koi post nahi. Pehli post aap karein!</div>';startFeedWatcher();return;}
+    const uids=[...new Set(posts.map(p=>p.authorId))];
+    Promise.all(uids.map(getUserInfo).concat([loadMyLikes(),loadMySaves()])).then(()=>{
+      list.innerHTML='';
+      posts.forEach(p=>list.appendChild(renderPostCard(p,{feed:true})));
+    });
+    startFeedWatcher();
+  }).catch(e=>{list.innerHTML='<div class="empty">'+esc(e.message)+'</div>';});
+  if(scrollTop){ window.scrollTo(0,0); const hs=document.getElementById('homeScreen'); if(hs) hs.scrollTop=0; }
+}
+function startFeedWatcher(){
+  if(feedUnsub) return;
+  feedUnsub=db.collection('posts').orderBy('createdAt','desc').limit(1).onSnapshot(snap=>{
+    if(snap.empty) return;
+    const ts=snap.docs[0].data().createdAt;
+    if(!ts||!ts.seconds) return;
+    if(ts.seconds>feedNewestSeen){
+      const banner=document.getElementById('feedNewBanner');
+      if(banner&&activeScreen==='homeScreen') banner.style.display='block';
+    }
+  },()=>{});
+}
+
+function clearPostForm(){
+  ['pTitle','pDesc','pPrice','pContact','pWa'].forEach(id=>{document.getElementById(id).value='';});
+  resetPhotoState('p');
+  const st=document.getElementById('pUploadStatus'); if(st) st.innerText='';
+  const fi=document.getElementById('pPhotoInput'); if(fi) fi.value='';
+}
+function openPostForm(){
+  editingPostId=null; clearPostForm();
+  document.getElementById('pCategory').disabled=false;
+  document.getElementById('postModalTitle').innerText='Nayi Post';
+  document.getElementById('pPublishBtn').innerText='Publish';
+  document.getElementById('postModal').classList.add('active');
+  updateFormFields();
+  if(!document.getElementById('pContact').value) document.getElementById('pContact').value=myPrivate.phone||'';
+  if(!document.getElementById('pWa').value) document.getElementById('pWa').value=myPrivate.whatsapp||'';
+}
+function closePostForm(){document.getElementById('postModal').classList.remove('active');}
+function editPost(p){
+  editingPostId=p.id;
+  const cat=document.getElementById('pCategory');
+  cat.value=p.category; cat.disabled=true;
+  document.getElementById('postModalTitle').innerText='Post Edit Karein';
+  document.getElementById('pPublishBtn').innerText='Update Karein';
+  document.getElementById('postModal').classList.add('active');
+  updateFormFields();
+  document.getElementById('pTitle').value=p.title||'';
+  document.getElementById('pDesc').value=p.desc||'';
+  document.getElementById('pPrice').value=p.price||'';
+  document.getElementById('pContact').value=p.contact||'';
+  document.getElementById('pWa').value=p.whatsapp||'';
+  [1,2].forEach(n=>{
+    const sel=document.getElementById('pExtra'+n+'Select'), inp=document.getElementById('pExtra'+n+'Input');
+    if(sel.style.display!=='none'){ if(p['extra'+n]) sel.value=p['extra'+n]; }
+    else if(inp.style.display!=='none'){ inp.value=p['extra'+n]||''; }
+  });
+  resetPhotoState('p');
+  photoState.p.existing=(p.images||[]).slice();
+  renderPhotoPreviews('p');
+}
+function submitPost(){
+  const category=document.getElementById('pCategory').value;
+  const title=document.getElementById('pTitle').value.trim();
+  const desc=document.getElementById('pDesc').value.trim();
+  const price=document.getElementById('pPrice').value.trim();
+  const contact=document.getElementById('pContact').value.trim();
+  const whatsapp=document.getElementById('pWa').value.trim();
+  const extra1=getExtraValue(1), extra2=getExtraValue(2);
+  if(!title||!contact){alert("Title aur Contact number zaroori hain");return;}
+  const btn=document.getElementById('pPublishBtn'); btn.disabled=true;
+  uploadPendingPhotos('p','pUploadStatus').then(images=>{
+    if(editingPostId){
+      db.collection('posts').doc(editingPostId).update({
+        title,desc,price,contact,whatsapp,extra1,extra2,images,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }).then(()=>{
+        editingPostId=null; closePostForm(); clearPostForm(); refreshCurrentView();
+      }).catch(e=>alert(e.message)).finally(()=>btn.disabled=false);
+      return;
+    }
+    db.collection('posts').add({
+      category,title,desc,price,contact,whatsapp,village:currentVillage,taluka:currentTaluka,status:'Available',
+      hidden:false,extra1,extra2,images,
+      authorId:auth.currentUser.uid,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    }).then(()=>{
+      closePostForm(); clearPostForm();
+      currentCategory=category;
+      refreshCurrentView();
+    }).catch(e=>alert(e.message)).finally(()=>btn.disabled=false);
+  }).catch(e=>{alert(e.message); btn.disabled=false;});
+}
+function showHome(){loadHome();}
+
+const EXPLORE_CATS=[
+  {id:'bazaar',ico:'🛒',name:'Bazaar'},{id:'jobs',ico:'💼',name:'Jobs'},
+  {id:'property',ico:'🏘️',name:'Property'},{id:'zameen',ico:'🌾',name:'Zameen'},
+  {id:'shops',ico:'🏪',name:'Shops'},{id:'workers',ico:'👷',name:'Workers'},
+  {id:'drivers',ico:'🚗',name:'Drivers'},{id:'animals',ico:'🐄',name:'Animals'},
+  {id:'services',ico:'🔧',name:'Services'},{id:'laado',ico:'🙋',name:'Zaroorat'},
+  {id:'announcements',ico:'📢',name:'Announcements'},{id:'help',ico:'🆘',name:'Help'},
+  {id:'lostfound',ico:'🔎',name:'Lost&Found'}
+];
+function openExplore(){
+  const talukas=['Poora Jamshoro','Kotri','Manjhand','Sehwan','Thano Bula Khan','Mera Ilaqah'];
+  const tf=document.getElementById('talukaFilters');
+  tf.innerHTML='';
+  talukas.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='btn secondary'; b.style.width='auto'; b.style.padding='7px 12px'; b.style.fontSize='12px';
+    b.innerText=t;
+    b.onclick=()=>{exploreTaluka=(t==='Poora Jamshoro')?'all':(t==='Mera Ilaqah'?currentTaluka:t); document.getElementById('exploreListTitle').innerText=t; refreshExploreView();};
+    tf.appendChild(b);
+  });
+  const cg=document.getElementById('exploreCatGrid');
+  cg.innerHTML='';
+  EXPLORE_CATS.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='cat';
+    d.innerHTML=`<span class="ico">${c.ico}</span>${c.name}`;
+    d.onclick=()=>{exploreCategory=c.id; document.getElementById('exploreListTitle').innerText=c.name+' — '+(exploreTaluka==='all'?'Poora Jamshoro':exploreTaluka); refreshExploreView();};
+    cg.appendChild(d);
+  });
+  exploreTaluka='all'; exploreCategory='';
+  document.getElementById('exploreListTitle').innerText='Poora Jamshoro — Recent';
+  document.getElementById('exploreSearch').value='';
+  show('exploreScreen');
+  loadExplorePosts();
+}
+function refreshExploreView(){
+  loadPeople(document.getElementById('exploreSearch').value.trim().toLowerCase());
+  if(exploreCategory==='shops') loadBusinessList();
+  else if(exploreCategory==='workers') loadWorkerList();
+  else loadExplorePosts();
+}
+function runExploreSearch(){
+  refreshExploreView();
+}
+function loadExplorePosts(){
+  const list=document.getElementById('explorePostList');
+  list.innerHTML='<div class="empty">Loading...</div>';
+  const term=document.getElementById('exploreSearch').value.trim().toLowerCase();
+  let q = exploreCategory
+    ? db.collection('posts').where('category','==',exploreCategory).orderBy('createdAt','desc').limit(100)
+    : db.collection('posts').orderBy('createdAt','desc').limit(100);
+  q.get().then(snap=>{
+    let posts=[];
+    snap.forEach(doc=>posts.push({id:doc.id,...doc.data()}));
+    posts=posts.filter(p=>!p.hidden);
+    if(exploreTaluka!=='all') posts=posts.filter(p=>p.taluka===exploreTaluka);
+    if(term) posts=posts.filter(p=>((p.title||'')+" "+(p.desc||'')).toLowerCase().includes(term));
+    if(posts.length===0){list.innerHTML='<div class="empty">Koi post nahi mili.</div>';return;}
+    Promise.all([loadMyLikes(),loadMySaves()]).then(()=>{
+      list.innerHTML='';
+      posts.forEach(p=>list.appendChild(renderPostCard(p)));
+    });
+  }).catch(e=>{list.innerHTML='<div class="empty">'+esc(e.message)+'</div>';});
+}
+
+function loadBusinessList(){
+  const list=document.getElementById('explorePostList');
+  list.innerHTML='<div class="empty">Loading...</div>';
+  const term=document.getElementById('exploreSearch').value.trim().toLowerCase();
+  db.collection('businesses').get().then(snap=>{
+    let items=[]; snap.forEach(doc=>items.push({id:doc.id,...doc.data()}));
+    if(exploreTaluka!=='all') items=items.filter(b=>b.taluka===exploreTaluka);
+    if(term) items=items.filter(b=>((b.name||'')+' '+(b.products||'')+' '+(b.category||'')).toLowerCase().includes(term));
+    list.innerHTML='';
+    const addBtn=document.createElement('button');
+    addBtn.className='btn'; addBtn.style.marginBottom='12px';
+    addBtn.innerText='🏪 Meri Business Profile Banayen / Edit Karein';
+    addBtn.onclick=openMyBusinessForm;
+    list.appendChild(addBtn);
+    if(items.length===0){const e=document.createElement('div');e.className='empty';e.innerText='Koi business nahi mili.';list.appendChild(e);return;}
+    items.forEach(b=>{
+      const wa=waNum(b);
+      const el=document.createElement('div'); el.className='card postcard';
+      el.innerHTML=`<h3>${esc(b.name)}</h3>
+        <div class="meta">${esc(b.category||'')} • ${esc(b.village||'')}</div>
+        <div class="meta">${esc(b.products||'')}</div>
+        <div class="meta">⏰ ${esc(b.openTime||'?')} - ${esc(b.closeTime||'?')} • Delivery: ${esc(b.delivery||'No')}</div>
+        <div class="row">
+          <a class="call" data-owner="${esc(b.ownerId)}" data-label="${esc(b.name)}" data-kind="Call" href="tel:${esc(b.contact)}">📞 Call</a>
+          <a class="wa" data-owner="${esc(b.ownerId)}" data-label="${esc(b.name)}" data-kind="WhatsApp" href="https://wa.me/${wa}" target="_blank">💬 WhatsApp</a>
+        </div>`;
+      if(b.images&&b.images.length){
+        const img=document.createElement('img');
+        img.src=b.images[0].url; img.alt='';
+        img.style.cssText='width:100%;max-height:170px;object-fit:cover;border-radius:8px;margin-bottom:8px;cursor:pointer;';
+        img.onclick=()=>openPhotoViewer(b.images,0);
+        el.insertBefore(img,el.firstChild);
+      }
+      list.appendChild(el);
+    });
+  }).catch(e=>{list.innerHTML='<div class="empty">'+e.message+'</div>';});
+}
+function openMyBusinessForm(){
+  show('bizFormScreen');
+  db.collection('businesses').doc(auth.currentUser.uid).get().then(doc=>{
+    const d=doc.data()||{};
+    document.getElementById('bizName').value=d.name||'';
+    document.getElementById('bizCategory').value=d.category||'';
+    document.getElementById('bizProducts').value=d.products||'';
+    document.getElementById('bizOpen').value=d.openTime||'';
+    document.getElementById('bizClose').value=d.closeTime||'';
+    document.getElementById('bizDelivery').value=d.delivery||'No';
+    document.getElementById('bizContact').value=d.contact||myPrivate.phone||'';
+    document.getElementById('bizWa').value=d.whatsapp||myPrivate.whatsapp||'';
+    resetPhotoState('biz');
+    photoState.biz.existing=(d.images||[]).slice();
+    renderPhotoPreviews('biz');
+  });
+}
+function saveBusiness(){
+  const name=document.getElementById('bizName').value.trim();
+  const contact=document.getElementById('bizContact').value.trim();
+  if(!name||!contact){alert('Business naam aur Contact zaroori hain');return;}
+  const btn=document.getElementById('bizSaveBtn'); btn.disabled=true;
+  uploadPendingPhotos('biz','bizUploadStatus').then(images=>{
+    const data={
+      name, contact, whatsapp:document.getElementById('bizWa').value.trim(),
+      category:document.getElementById('bizCategory').value.trim(),
+      products:document.getElementById('bizProducts').value.trim(),
+      openTime:document.getElementById('bizOpen').value.trim(),
+      closeTime:document.getElementById('bizClose').value.trim(),
+      delivery:document.getElementById('bizDelivery').value,
+      images,
+      village:currentVillage, taluka:currentTaluka,
+      ownerId:auth.currentUser.uid,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    };
+    db.collection('businesses').doc(auth.currentUser.uid).set(data).then(()=>{
+      exploreCategory='shops'; show('exploreScreen'); loadBusinessList();
+    }).catch(e=>alert(e.message)).finally(()=>btn.disabled=false);
+  }).catch(e=>{alert(e.message); btn.disabled=false;});
+}
+
+function loadWorkerList(){
+  const list=document.getElementById('explorePostList');
+  list.innerHTML='<div class="empty">Loading...</div>';
+  const term=document.getElementById('exploreSearch').value.trim().toLowerCase();
+  db.collection('workers').get().then(snap=>{
+    let items=[]; snap.forEach(doc=>items.push({id:doc.id,...doc.data()}));
+    if(exploreTaluka!=='all') items=items.filter(w=>w.taluka===exploreTaluka);
+    if(term) items=items.filter(w=>((w.name||'')+' '+(w.workType||'')).toLowerCase().includes(term));
+    list.innerHTML='';
+    const addBtn=document.createElement('button');
+    addBtn.className='btn'; addBtn.style.marginBottom='12px';
+    addBtn.innerText='👷 Meri Worker Profile Banayen / Edit Karein';
+    addBtn.onclick=openMyWorkerForm;
+    list.appendChild(addBtn);
+    if(items.length===0){const e=document.createElement('div');e.className='empty';e.innerText='Koi worker nahi mila.';list.appendChild(e);return;}
+    items.forEach(w=>{
+      const wa=waNum(w);
+      const el=document.createElement('div'); el.className='card postcard';
+      el.innerHTML=`<h3>${esc(w.name)} — ${esc(w.workType||'')}</h3>
+        <div class="meta">${esc(w.village||'')} • Experience: ${esc(w.experience||'-')} • <b>${esc(availLabel(w.availability||''))}</b></div>
+        <div class="meta">${esc(w.desc||'')}</div>
+        <div class="row">
+          <a class="call" data-owner="${esc(w.ownerId)}" data-label="${esc(w.name)}" data-kind="Call" href="tel:${esc(w.contact)}">📞 Call</a>
+          <a class="wa" data-owner="${esc(w.ownerId)}" data-label="${esc(w.name)}" data-kind="WhatsApp" href="https://wa.me/${wa}" target="_blank">💬 WhatsApp</a>
+        </div>`;
+      list.appendChild(el);
+    });
+  }).catch(e=>{list.innerHTML='<div class="empty">'+e.message+'</div>';});
+}
+function openMyWorkerForm(){
+  show('workerFormScreen');
+  db.collection('workers').doc(auth.currentUser.uid).get().then(doc=>{
+    const d=doc.data()||{};
+    document.getElementById('wkName').value=d.name||'';
+    document.getElementById('wkType').value=d.workType||'Raj Mistri/Mason';
+    document.getElementById('wkExp').value=d.experience||'';
+    document.getElementById('wkAvail').value=d.availability||'Free — Kaam le sakta hoon';
+    document.getElementById('wkContact').value=d.contact||myPrivate.phone||'';
+    document.getElementById('wkWa').value=d.whatsapp||myPrivate.whatsapp||'';
+    document.getElementById('wkDesc').value=d.desc||'';
+  });
+}
+function saveWorker(){
+  const name=document.getElementById('wkName').value.trim();
+  const contact=document.getElementById('wkContact').value.trim();
+  if(!name||!contact){alert('Naam aur Contact zaroori hain');return;}
+  const data={
+    name, contact, whatsapp:document.getElementById('wkWa').value.trim(),
+    workType:document.getElementById('wkType').value,
+    experience:document.getElementById('wkExp').value.trim(),
+    availability:document.getElementById('wkAvail').value,
+    desc:document.getElementById('wkDesc').value.trim(),
+    village:currentVillage, taluka:currentTaluka,
+    ownerId:auth.currentUser.uid,
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  };
+  db.collection('workers').doc(auth.currentUser.uid).set(data).then(()=>{
+    exploreCategory='workers'; show('exploreScreen'); loadWorkerList();
+  }).catch(e=>alert(e.message));
+}
+
+function openMyPosts(){
+  show('myPostsScreen');
+  const list=document.getElementById('myPostsList');
+  list.innerHTML='<div class="empty">Loading...</div>';
+  db.collection('posts').where('authorId','==',auth.currentUser.uid).get().then(snap=>{
+    const items=[];
+    snap.forEach(doc=>items.push({id:doc.id,...doc.data()}));
+    items.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    if(items.length===0){list.innerHTML='<div class="empty">Aap ne abhi tak koi post nahi ki.</div>';return;}
+    Promise.all([loadMyLikes(),loadMySaves()]).then(()=>{
+      list.innerHTML='';
+      items.forEach(p=>list.appendChild(renderPostCard(p,{showCategory:true})));
+    });
+  }).catch(e=>{list.innerHTML='<div class="empty">'+esc(e.message)+'</div>';});
+}
+function refreshCurrentView(){
+  if(activeScreen==='myPostsScreen') openMyPosts();
+  else if(activeScreen==='exploreScreen') refreshExploreView();
+  else if(activeScreen==='profileScreen') openProfile(lastProfileUid);
+  else loadFeed(true);
+}
+function setPostStatus(id,status){
+  db.collection('posts').doc(id).update({status}).then(refreshCurrentView).catch(e=>alert(e.message));
+}
+function setPostHidden(id,hidden){
+  db.collection('posts').doc(id).update({hidden}).then(refreshCurrentView).catch(e=>alert(e.message));
+}
+function deletePost(id){
+  if(!confirm('Ye post delete karni hai? Ye wapas nahi aayegi.'))return;
+  db.collection('posts').doc(id).delete().then(refreshCurrentView).catch(e=>alert(e.message));
+}
+function waNum(x){
+  let n=String((x&&(x.whatsapp||x.contact))||'').replace(/[^0-9]/g,'');
+  if(n.startsWith('0')) n='92'+n.slice(1);
+  return n;
+}
+const STATUS_LABELS={Available:'ابھی دستیاب ہے',Sold:'بک گیا',Rented:'کرائے پر دے دیا',
+  Completed:'معاملہ مکمل ہو گیا',Resolved:'معاملہ مکمل ہو گیا',Returned:'معاملہ مکمل ہو گیا',Closed:'معاملہ مکمل ہو گیا',Busy:'ابھی مصروف ہوں'};
+const AVAIL_LABELS={'Free — Kaam le sakta hoon':'ابھی فارغ ہوں','Busy':'ابھی مصروف ہوں','Available Soon':'2 دن بعد فارغ ہوں'};
+function statusLabel(st){return STATUS_LABELS[st]||st;}
+function availLabel(a){return AVAIL_LABELS[a]||a;}
+const STATUS_OPTIONS={bazaar:['Sold'],animals:['Sold'],zameen:['Sold'],property:['Sold','Rented'],jobs:['Closed'],
+  laado:['Completed'],help:['Resolved'],lostfound:['Returned'],drivers:['Busy'],services:['Busy'],announcements:['Closed']};
+function statusBadge(p){
+  const st=p.status||'Available';
+  return st==='Available'?'':`<span style="background:var(--maroon);color:#fff;border-radius:6px;padding:1px 7px;font-size:11px;margin-left:6px;">${esc(statusLabel(st))}</span>`;
+}
+function closePostMenus(){document.querySelectorAll('.postmenu').forEach(m=>{m.style.display='none';});}
+document.addEventListener('click',closePostMenus);
+function buildPostMenu(p){
+  const wrap=document.createElement('div');
+  const btn=document.createElement('button');
+  btn.innerText='⋮'; btn.setAttribute('aria-label','Post options');
+  btn.style.cssText='position:absolute;top:4px;right:4px;background:none;border:none;font-size:24px;line-height:1;padding:6px 12px;color:#6B7280;';
+  const menu=document.createElement('div'); menu.className='postmenu';
+  menu.style.cssText='display:none;position:absolute;top:38px;right:8px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5;min-width:190px;overflow:hidden;';
+  const status=p.status||'Available';
+  const items=[['✏️ Edit',()=>editPost(p)]];
+  (STATUS_OPTIONS[p.category]||['Completed']).forEach(st=>{ if(st!==status) items.push(['✅ '+statusLabel(st),()=>setPostStatus(p.id,st)]); });
+  if(status!=='Available') items.push(['♻️ '+statusLabel('Available'),()=>setPostStatus(p.id,'Available')]);
+  items.push([p.hidden?'👁️ Unhide':'🙈 Hide',()=>setPostHidden(p.id,!p.hidden)]);
+  items.push(['🗑️ Delete',()=>deletePost(p.id)]);
+  items.forEach(([label,fn],i)=>{
+    const it=document.createElement('div'); it.innerText=label;
+    it.style.cssText='padding:12px 14px;font-size:14px;'+(i?'border-top:1px solid var(--line);':'')+(i===items.length-1?'color:var(--maroon);':'');
+    it.onclick=e=>{e.stopPropagation();closePostMenus();fn();};
+    menu.appendChild(it);
+  });
+  btn.onclick=e=>{e.stopPropagation();const open=menu.style.display==='block';closePostMenus();menu.style.display=open?'none':'block';};
+  wrap.appendChild(btn); wrap.appendChild(menu);
+  return wrap;
+}
+function catLabel(cat){
+  const c=EXPLORE_CATS.find(x=>x.id===cat);
+  return c?(c.ico+' '+c.name):esc(cat||'');
+}
+function formatRelTime(ts){
+  if(!ts||!ts.seconds) return '';
+  const diff=Math.floor(Date.now()/1000)-ts.seconds;
+  if(diff<60) return 'Abhi';
+  if(diff<3600) return Math.floor(diff/60)+' min pehle';
+  if(diff<86400) return Math.floor(diff/3600)+' ghantay pehle';
+  if(diff<172800) return 'Kal';
+  return new Date(ts.seconds*1000).toLocaleDateString();
+}
+function renderPostCard(p,opts){
+  opts=opts||{};
+  const isOwner=!!auth.currentUser&&p.authorId===auth.currentUser.uid;
+  const el=document.createElement('div');
+  el.className='card postcard'; el.style.position='relative';
+  if(opts.feed){
+    const info=userInfoCache[p.authorId]||{name:'AN Community User',photo:null,village:'',taluka:''};
+    const loc=[info.village,info.taluka].filter(Boolean).map(esc).join(' • ');
+    const head=document.createElement('div');
+    head.style.cssText='display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer;';
+    head.innerHTML=`${avatarHTML(info,40)}<div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${esc(info.name)}</div>
+        <div class="meta" style="margin:0;">${loc?loc+' • ':''}${esc(formatRelTime(p.createdAt))}</div>
+      </div>
+      <div style="background:var(--sand);border:1px solid var(--line);border-radius:8px;padding:3px 8px;font-size:11px;white-space:nowrap;">${catLabel(p.category)}</div>`;
+    head.onclick=e=>{ if(e.target.closest('a')) return; openProfile(p.authorId); };
+    el.appendChild(head);
+  }
+  const hiddenTag=p.hidden?'<span style="background:#6B7280;color:#fff;border-radius:6px;padding:1px 7px;font-size:11px;margin-left:6px;">HIDDEN</span>':'';
+  el.innerHTML=`<h3 style="padding-right:${isOwner?34:0}px;">${esc(p.title)}${statusBadge(p)}${hiddenTag}</h3>
+    ${p.price?`<div class="price">Rs. ${esc(p.price)}</div>`:''}
+    <div class="meta">${opts.showCategory?esc(p.category)+' • ':''}${esc(p.village||'')}${p.extra1?" • "+esc(p.extra1):""}${p.extra2?" • "+esc(p.extra2):""} • ${esc(p.desc||'')}</div>
+    <div class="row">
+      <a class="call" data-owner="${esc(p.authorId)}" data-label="${esc(p.title)}" data-kind="Call" href="tel:${esc(p.contact)}">📞 Call</a>
+      <a class="wa" data-owner="${esc(p.authorId)}" data-label="${esc(p.title)}" data-kind="WhatsApp" href="https://wa.me/${waNum(p)}" target="_blank">💬 WhatsApp</a>
+    </div>`;
+  if(p.images&&p.images.length){
+    const img=document.createElement('img');
+    img.src=p.images[0].url; img.alt='';
+    img.style.cssText='width:100%;max-height:170px;object-fit:cover;border-radius:8px;margin-bottom:8px;cursor:pointer;';
+    img.onclick=()=>openPhotoViewer(p.images,0);
+    el.insertBefore(img,el.firstChild);
+  }
+  if(isOwner) el.appendChild(buildPostMenu(p));
+  el.appendChild(buildActionsRow(p));
+  return el;
+}
+function buildActionsRow(p){
+  const likeCount=p.likeCount||0, commentCount=p.commentCount||0;
+  const liked=!!(myLikedPosts&&myLikedPosts.has(p.id));
+  const saved=!!(mySavedPosts&&mySavedPosts.has(p.id));
+  const row=document.createElement('div');
+  row.className='row'; row.style.cssText='margin-top:8px;flex-wrap:wrap;';
+  const mk=(txt,fn)=>{const a=document.createElement('a');a.href='#';a.className='postAction';a.innerText=txt;
+    a.onclick=e=>{e.preventDefault();fn();};return a;};
+  const likeBtn=mk((liked?'❤️ ':'🤍 ')+likeCount, ()=>toggleLike(p,likeBtn));
+  row.appendChild(likeBtn);
+  row.appendChild(mk('💬 '+commentCount, ()=>openComments(p)));
+  row.appendChild(mk('🔗 Share', ()=>sharePost(p)));
+  const saveBtn=mk(saved?'🔖':'📑', ()=>toggleSave(p,saveBtn));
+  row.appendChild(saveBtn);
+  row.appendChild(buildMoreMenuWrap(p));
+  return row;
+}
+function buildMoreMenuWrap(p){
+  const wrap=document.createElement('div'); wrap.style.cssText='position:relative;flex:1;';
+  const btn=document.createElement('a'); btn.href='#'; btn.className='postAction'; btn.innerText='⋮';
+  const menu=document.createElement('div'); menu.className='postmenu';
+  menu.style.cssText='display:none;position:absolute;bottom:38px;right:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:6;min-width:170px;overflow:hidden;';
+  const isOwner=!!auth.currentUser&&p.authorId===auth.currentUser.uid;
+  const items=[['🔗 Copy Link',()=>copyPostLink(p.id)]];
+  if(!isOwner) items.push(['🚩 Report',()=>openReport(p.id)]);
+  items.forEach(([label,fn],i)=>{
+    const it=document.createElement('div'); it.innerText=label;
+    it.style.cssText='padding:12px 14px;font-size:14px;'+(i?'border-top:1px solid var(--line);':'');
+    it.onclick=e=>{e.stopPropagation();closePostMenus();fn();};
+    menu.appendChild(it);
+  });
+  btn.onclick=e=>{e.preventDefault();e.stopPropagation();const open=menu.style.display==='block';closePostMenus();menu.style.display=open?'none':'block';};
+  wrap.appendChild(btn); wrap.appendChild(menu);
+  return wrap;
+}
+
+const CATEGORY_FIELDS={
+  bazaar:{priceLabel:'Price',photos:true,extra1:{label:'Condition',type:'select',options:['New','Used']}},
+  jobs:{priceLabel:'Salary (agar ho to)',extra1:{label:'Employer / Business Naam',type:'text'},extra2:{label:'Job Type',type:'select',options:['Full-time','Part-time','Daily Wage']}},
+  property:{priceLabel:'Price',photos:true,extra1:{label:'Sale ya Rent',type:'select',options:['Sale','Rent']},extra2:{label:'Property Type',type:'select',options:['House','Shop','Room','Plot','Building','Other']}},
+  zameen:{priceLabel:'Price',photos:true,extra1:{label:'Sale ya Rent',type:'select',options:['Sale','Rent']},extra2:{label:'Zameen Type',type:'select',options:['Agricultural','Residential','Commercial']}},
+  shops:{priceLabel:'Price (agar ho to)'},
+  workers:{priceLabel:'Charges (agar ho to)',extra1:{label:'Kaam ki Qisam',type:'select',options:['Raj Mistri/Mason','Plumber','Electrician','Carpenter','Painter','Tile Worker','AC Technician','General Labour','Other']},extra2:{label:'Availability',type:'select',options:['Free — Kaam le sakta hoon','Busy','Available Soon']}},
+  drivers:{priceLabel:'Charges (agar ho to)',extra1:{label:'Vehicle Type',type:'text'},extra2:{label:'Availability',type:'select',options:['Free — Kaam le sakta hoon','Busy','Available Soon']}},
+  animals:{priceLabel:'Price',photos:true,extra1:{label:'Animal Type',type:'select',options:['Cow','Buffalo','Goat','Sheep','Camel','Poultry','Other']},extra2:{label:'Age (agar ho to)',type:'text'}},
+  services:{priceLabel:'Charges (agar ho to)',extra1:{label:'Service Type',type:'text'},extra2:{label:'Availability',type:'select',options:['Free — Kaam le sakta hoon','Busy','Available Soon']}},
+  laado:{priceLabel:'Budget (agar ho to)',photos:true,
+    extra1:{label:'Zaroorat ki Qisam',type:'select',options:['Mujhe Raza chahiye','Mujhe plumber chahiye','Mujhe koi cheez chahiye','Mujhe kisi se koi kaam karwana hai']},
+    extra2:{label:'Required Date (agar ho to)',type:'text'}},
+  announcements:{priceLabel:'',hidePrice:true},
+  help:{priceLabel:'',hidePrice:true,extra1:{label:'Urgency',type:'select',options:['Normal','Urgent']}},
+  lostfound:{priceLabel:'',hidePrice:true,extra1:{label:'Lost ya Found?',type:'select',options:['Lost','Found']},extra2:{label:'Item Type',type:'text'}}
+};
+function setupExtra(n,cfg){
+  const group=document.getElementById('pExtra'+n+'Group');
+  const sel=document.getElementById('pExtra'+n+'Select');
+  const inp=document.getElementById('pExtra'+n+'Input');
+  const lbl=document.getElementById('pExtra'+n+'Label');
+  if(!cfg){group.style.display='none';return;}
+  group.style.display='block'; lbl.innerText=cfg.label;
+  if(cfg.type==='select'){
+    sel.style.display='block'; inp.style.display='none';
+    sel.innerHTML=cfg.options.map(o=>`<option value="${o}">${o}</option>`).join('');
+  } else {
+    sel.style.display='none'; inp.style.display='block'; inp.value='';
+  }
+}
+function updateFormFields(){
+  const cat=document.getElementById('pCategory').value;
+  const cfg=CATEGORY_FIELDS[cat]||{};
+  setupExtra(1,cfg.extra1); setupExtra(2,cfg.extra2);
+  const photosGroup=document.getElementById('pPhotosGroup');
+  photosGroup.style.display=cfg.photos?'block':'none';
+  const priceGroup=document.getElementById('pPriceGroup');
+  if(cfg.hidePrice){priceGroup.style.display='none';}
+  else{priceGroup.style.display='block'; document.getElementById('pPriceLabel').innerText=cfg.priceLabel||'Price (agar ho to)';}
+}
+function getExtraValue(n){
+  const sel=document.getElementById('pExtra'+n+'Select');
+  const inp=document.getElementById('pExtra'+n+'Input');
+  if(sel.style.display!=='none') return sel.value;
+  if(inp.style.display!=='none') return inp.value.trim();
+  return '';
+}
+
+function loadMyFollowing(){
+  if(myFollowing) return Promise.resolve(myFollowing);
+  return db.collection('follows').where('followerId','==',auth.currentUser.uid).get().then(snap=>{
+    myFollowing=new Set(); snap.forEach(d=>myFollowing.add(d.data().followeeId)); return myFollowing;
+  });
+}
+function toggleFollow(uid,btn,after){
+  const me=auth.currentUser.uid; if(uid===me) return;
+  const ref=db.collection('follows').doc(me+'_'+uid);
+  loadMyFollowing().then(set=>{
+    if(set.has(uid)){
+      return ref.delete().then(()=>{set.delete(uid); if(btn) btn.innerText='Follow'; if(after) after();});
+    }
+    return ref.set({followerId:me,followeeId:uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+      .then(()=>{sendNotification(uid,'follow',uid,'','');set.add(uid); if(btn) btn.innerText='Following ✓'; if(after) after();});
+  }).catch(e=>alert(e.message));
+}
+function loadPeople(term){
+  const box=document.getElementById('explorePeopleList');
+  if(!term){box.innerHTML='';return;}
+  box.innerHTML='<div class="empty" style="padding:12px;">People dhoond rahe hain...</div>';
+  Promise.all([db.collection('users').limit(300).get(),loadMyFollowing()]).then(([snap,fset])=>{
+    const people=[];
+    snap.forEach(d=>{const u=d.data(); if((u.name||'').toLowerCase().includes(term)) people.push({id:d.id,...u});});
+    box.innerHTML='<strong>👥 People</strong>';
+    if(!people.length){box.innerHTML+='<div class="empty" style="padding:12px;">Is naam ka koi user nahi mila.</div>';return;}
+    people.slice(0,20).forEach(u=>{
+      const isMe=u.id===auth.currentUser.uid;
+      const el=document.createElement('div'); el.className='card postcard'; el.style.marginTop='8px';
+      el.innerHTML=`<div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;">${avatarHTML(u,44)}<div><h3 style="margin:0;">${esc(u.name)}</h3><div class="meta" style="margin:0;">${esc(u.village||'')} • ${esc(u.taluka||'')}</div></div></div>
+        <div class="row"><a class="call" href="#">👤 View Profile</a>${isMe?'':`<a class="wa" href="#">${fset.has(u.id)?'Following ✓':'Follow'}</a>`}</div>`;
+      const links=el.querySelectorAll('a');
+      links[0].onclick=()=>{openProfile(u.id);return false;};
+      if(!isMe) links[1].onclick=()=>{toggleFollow(u.id,links[1]);return false;};
+      box.appendChild(el);
+    });
+  }).catch(e=>{box.innerHTML='<div class="empty">'+esc(e.message)+'</div>';});
+}
+function openProfile(uid){
+  const me=auth.currentUser.uid; uid=uid||me; const isMe=uid===me; lastProfileUid=uid;
+  show('profileScreen');
+  const body=document.getElementById('profileBody');
+  body.innerHTML='<div class="empty">Loading...</div>';
+  Promise.all([
+    db.collection('users').doc(uid).get(),
+    db.collection('follows').where('followeeId','==',uid).get(),
+    db.collection('follows').where('followerId','==',uid).get(),
+    db.collection('posts').where('authorId','==',uid).get(),
+    db.collection('businesses').doc(uid).get(),
+    db.collection('workers').doc(uid).get(),
+    loadMyFollowing()
+  ]).then(([uDoc,frs,fng,posts,biz,wk,fset])=>{
+    const u=uDoc.data();
+    if(!u){body.innerHTML='<div class="empty">Profile nahi mili.</div>';return;}
+    const loc=[u.village,u.uc,u.taluka,u.district].filter(Boolean).map(esc).join(', ');
+    const items=[]; posts.forEach(d=>items.push({id:d.id,...d.data()}));
+    const visible=isMe?items:items.filter(x=>!x.hidden);
+    visible.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    let html=`<div class="card"><div style="display:flex;gap:14px;align-items:center;margin-bottom:10px;">${avatarHTML(u,72)}<div><h2 style="font-size:20px;">${esc(u.name)}</h2>
+      <div class="meta">📍 ${loc}</div></div></div>
+      ${u.bio?`<div class="meta" style="margin-bottom:12px;color:var(--ink);">${esc(u.bio)}</div>`:''}
+      <div class="row" style="text-align:center;margin-bottom:12px;">
+        <div style="flex:1"><b>${frs.size}</b><br><small>Followers</small></div>
+        <div style="flex:1"><b>${fng.size}</b><br><small>Following</small></div>
+        <div style="flex:1"><b>${visible.length}</b><br><small>Posts</small></div>
+      </div>`;
+    html+= isMe
+      ? `<button class="btn" id="profEdit">✏️ Profile Edit Karein</button>
+         <button class="btn secondary" id="profPrivate" style="margin-top:8px;">🔒 Personal Details (Private)</button>
+         <button class="btn secondary" id="profSaved" style="margin-top:8px;">🔖 Saved Posts</button>
+         <button class="btn secondary" id="profLogout" style="margin-top:8px;">Logout</button>`
+      : `<button class="btn" id="profFollow">${fset.has(uid)?'Following ✓':'Follow'}</button>`;
+    html+='</div>';
+    if(biz.exists){const b=biz.data(); html+=`<div class="card postcard"><h3>🏪 ${esc(b.name)}</h3><div class="meta">${esc(b.category||'')}</div><div class="meta">${esc(b.products||'')}</div><div class="meta">⏰ ${esc(b.openTime||'?')} - ${esc(b.closeTime||'?')} • Delivery: ${esc(b.delivery||'No')}</div></div>`;}
+    if(wk.exists){const w=wk.data(); html+=`<div class="card postcard"><h3>👷 ${esc(w.workType||'')}</h3><div class="meta">Experience: ${esc(w.experience||'-')} • <b>${esc(availLabel(w.availability||''))}</b></div><div class="meta">${esc(w.desc||'')}</div></div>`;}
+    html+='<strong>Posts</strong><div id="profPosts" style="margin-top:8px;"></div>';
+    body.innerHTML=html;
+    const pp=document.getElementById('profPosts');
+    Promise.all([loadMyLikes(),loadMySaves()]).then(()=>{
+      if(!visible.length) pp.innerHTML='<div class="empty" style="padding:16px;">Abhi koi post nahi.</div>';
+      visible.forEach(x=>pp.appendChild(renderPostCard(x,{showCategory:true})));
+    });
+    const pe=document.getElementById('profEdit'); if(pe) pe.onclick=openProfileEdit;
+    const pv=document.getElementById('profPrivate'); if(pv) pv.onclick=openPrivate;
+    const ps=document.getElementById('profSaved'); if(ps) ps.onclick=openSaved;
+    const f=document.getElementById('profFollow');
+    if(f) f.onclick=()=>toggleFollow(uid,f,()=>openProfile(uid));
+    const lo=document.getElementById('profLogout');
+    if(lo) lo.onclick=doLogout;
+  }).catch(e=>{body.innerHTML='<div class="empty">'+esc(e.message)+'</div>';});
+}
+
+function sendNotification(toUserId,type,refId,label,kind){
+  const me=auth.currentUser; if(!me||!toUserId||toUserId===me.uid) return;
+  db.collection('notifications').doc(type+'_'+me.uid+'_'+refId).set({
+    toUserId, fromUserId:me.uid, fromName:currentName, type, label:label||'', kind:kind||'',
+    read:false, createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(()=>{});
+}
+document.addEventListener('click',e=>{
+  const a=e.target.closest&&e.target.closest('a[data-owner]'); if(!a) return;
+  sendNotification(a.dataset.owner,'contact',a.dataset.owner,a.dataset.label,a.dataset.kind);
+});
+function startNotifListener(){
+  if(notifUnsub||!auth.currentUser) return;
+  notifUnsub=db.collection('notifications').where('toUserId','==',auth.currentUser.uid).where('read','==',false).limit(20)
+    .onSnapshot(snap=>{
+      const b=document.getElementById('bellCount');
+      if(snap.size>0){b.innerText=snap.size>=20?'20+':snap.size;b.style.display='block';} else {b.style.display='none';}
+    },()=>{});
+}
+function openNotifications(){
+  show('notifScreen');
+  const box=document.getElementById('notifList');
+  box.innerHTML='<div class="empty">Loading...</div>';
+  const uid=auth.currentUser.uid;
+  db.collection('notifications').where('toUserId','==',uid).limit(50).get().then(snap=>{
+    const items=[]; snap.forEach(d=>items.push({id:d.id,...d.data()}));
+    items.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    if(!items.length){box.innerHTML='<div class="empty">Abhi koi notification nahi.</div>';return;}
+    box.innerHTML='';
+    const batch=db.batch(); let unread=0;
+    items.forEach(n=>{
+      const text=n.type==='follow'
+        ? `<b>${esc(n.fromName||'Kisi')}</b> ne aap ko follow kiya`
+        : `<b>${esc(n.fromName||'Kisi')}</b> ne aap ki "${esc(n.label||'')}" par ${esc(n.kind||'rabta')} kiya`;
+      const when=n.createdAt?new Date(n.createdAt.seconds*1000).toLocaleString():'';
+      const el=document.createElement('div'); el.className='card postcard';
+      if(!n.read){el.style.borderColor='var(--maroon)';batch.update(db.collection('notifications').doc(n.id),{read:true});unread++;}
+      el.innerHTML=`<div>${text}</div><div class="meta" style="margin-top:4px;">${esc(when)}</div><div class="row"><a class="call" href="#">👤 View Profile</a></div>`;
+      el.querySelector('a').onclick=()=>{openProfile(n.fromUserId);return false;};
+      box.appendChild(el);
+    });
+    if(unread) batch.commit().catch(()=>{});
+  }).catch(e=>{box.innerHTML='<div class="empty">'+esc(e.message)+'</div>';});
+}
+
+function avatarHTML(u,size){
+  const sz=size||64;
+  if(u&&u.photo&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(u.photo))
+    return `<img src="${u.photo}" alt="" style="width:${sz}px;height:${sz}px;border-radius:50%;object-fit:cover;flex-shrink:0;">`;
+  const ch=esc(((u&&u.name)||'?').trim().charAt(0).toUpperCase()||'?');
+  return `<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:var(--indigo);color:#fff;display:flex;align-items:center;justify-content:center;font-size:${Math.round(sz*0.45)}px;font-weight:700;flex-shrink:0;">${ch}</div>`;
+}
+let pePhoto=null, peDistrict='Jamshoro';
+function fillSelect(sel,list,selected,placeholder){
+  sel.innerHTML=`<option value="">${placeholder}</option>`+list.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  if(selected) sel.value=selected;
+}
+function peTalukaChanged(){
+  const t=document.getElementById('peTaluka').value;
+  fillSelect(document.getElementById('peUC'),(LOCATION_DATA[peDistrict]||{})[t]||[],'','-- UC chunein --');
+}
+function resizePhoto(file,cb){
+  const r=new FileReader();
+  r.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const S=128, c=document.createElement('canvas'); c.width=S; c.height=S;
+      const m=Math.min(img.width,img.height);
+      c.getContext('2d').drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,S,S);
+      cb(c.toDataURL('image/jpeg',0.7));
+    };
+    img.onerror=()=>alert('Ye photo khul nahi saki');
+    img.src=r.result;
+  };
+  r.readAsDataURL(file);
+}
+function onPePhoto(inp){
+  const f=inp.files&&inp.files[0]; if(!f) return;
+  if(!f.type.startsWith('image/')){alert('Sirf photo select karein');return;}
+  resizePhoto(f,d=>{pePhoto=d;document.getElementById('peAvatar').innerHTML=avatarHTML({photo:d,name:document.getElementById('peName').value},80);});
+}
+function removePePhoto(){
+  pePhoto='';
+  document.getElementById('peAvatar').innerHTML=avatarHTML({name:document.getElementById('peName').value},80);
+}
+function openProfileEdit(){
+  pePhoto=null; show('profileEditScreen');
+  db.collection('users').doc(auth.currentUser.uid).get().then(doc=>{
+    const u=doc.data()||{}; peDistrict=u.district||'Jamshoro';
+    document.getElementById('peName').value=u.name||'';
+    document.getElementById('peBio').value=u.bio||'';
+    document.getElementById('peVillage').value=u.village||'';
+    fillSelect(document.getElementById('peTaluka'),Object.keys(LOCATION_DATA[peDistrict]||{}),u.taluka,'-- Taluka chunein --');
+    fillSelect(document.getElementById('peUC'),(LOCATION_DATA[peDistrict]||{})[u.taluka]||[],u.uc,'-- UC chunein --');
+    document.getElementById('peAvatar').innerHTML=avatarHTML(u,80);
+    document.getElementById('peFile').value='';
+  }).catch(e=>alert(e.message));
+}
+function saveProfile(){
+  const name=document.getElementById('peName').value.trim();
+  const taluka=document.getElementById('peTaluka').value;
+  const uc=document.getElementById('peUC').value;
+  const village=document.getElementById('peVillage').value.trim();
+  if(!name||!taluka||!uc||!village){alert('Naam, Taluka, UC aur Village zaroori hain');return;}
+  const data={name,bio:document.getElementById('peBio').value.trim(),taluka,uc,village,district:peDistrict};
+  if(pePhoto==='') data.photo=firebase.firestore.FieldValue.delete();
+  else if(pePhoto) data.photo=pePhoto;
+  db.collection('users').doc(auth.currentUser.uid).update(data).then(()=>{
+    currentName=name; currentTaluka=taluka; currentVillage=[village,uc,taluka].filter(Boolean).join(', ');
+    openProfile(auth.currentUser.uid);
+  }).catch(e=>alert(e.message));
+}
+function openPrivate(){
+  show('privateScreen');
+  db.collection('users').doc(auth.currentUser.uid).collection('private').doc('info').get().then(d=>{
+    myPrivate=d.data()||{};
+    document.getElementById('pvLogin').innerText=myPrivate.mobile||'-';
+    document.getElementById('pvPhone').value=myPrivate.phone||'';
+    document.getElementById('pvWa').value=myPrivate.whatsapp||'';
+  }).catch(e=>alert(e.message));
+}
+function savePrivate(){
+  const phone=document.getElementById('pvPhone').value.trim();
+  const whatsapp=document.getElementById('pvWa').value.trim();
+  const ok=v=>!v||/^[0-9+\s-]{7,16}$/.test(v);
+  if(!ok(phone)||!ok(whatsapp)){alert('Number sahi likhein (sirf 0-9, + aur -)');return;}
+  db.collection('users').doc(auth.currentUser.uid).collection('private').doc('info')
+    .set({phone,whatsapp},{merge:true}).then(()=>{
+      myPrivate={...myPrivate,phone,whatsapp};
+      alert('Save ho gaya'); openProfile(auth.currentUser.uid);
+    }).catch(e=>alert(e.message));
+}
+
+const CLOUDINARY_CLOUD='iu39myrn';
+const CLOUDINARY_PRESET='an_up_k7m3n';
+const photoState={p:{files:[],existing:[]},biz:{files:[],existing:[]}};
+function resizeImageFile(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        let w=img.width,h=img.height; const MAX=1000;
+        if(w>MAX||h>MAX){ if(w>h){h=Math.round(h*MAX/w);w=MAX;} else {w=Math.round(w*MAX/h);h=MAX;} }
+        const c=document.createElement('canvas'); c.width=w; c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        c.toBlob(blob=>{ if(!blob){reject(new Error('Photo process nahi ho saki'));return;} resolve({blob,dataUrl:c.toDataURL('image/jpeg',0.6)}); },'image/jpeg',0.72);
+      };
+      img.onerror=()=>reject(new Error('Ye photo khul nahi saki'));
+      img.src=reader.result;
+    };
+    reader.onerror=()=>reject(new Error('Photo read nahi ho saki'));
+    reader.readAsDataURL(file);
+  });
+}
+function uploadToCloudinary(blob){
+  const fd=new FormData();
+  fd.append('file',blob);
+  fd.append('upload_preset',CLOUDINARY_PRESET);
+  return fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{ if(d.error) throw new Error(d.error.message); return {url:d.secure_url,publicId:d.public_id,width:d.width,height:d.height}; });
+}
+function onPhotoPick(key,inp){
+  const st=photoState[key];
+  const files=Array.from(inp.files||[]);
+  inp.value='';
+  const room=5-(st.files.length+st.existing.length);
+  if(room<=0){alert('Zyada se zyada 5 photos ek post mein.');return;}
+  files.slice(0,room).forEach(f=>{
+    if(!f.type||!f.type.startsWith('image/')) return;
+    resizeImageFile(f).then(r=>{ st.files.push(r); renderPhotoPreviews(key); }).catch(e=>alert(e.message));
+  });
+}
+function removeNewPhoto(key,idx){photoState[key].files.splice(idx,1);renderPhotoPreviews(key);}
+function removeExistingPhoto(key,idx){photoState[key].existing.splice(idx,1);renderPhotoPreviews(key);}
+function renderPhotoPreviews(key){
+  const st=photoState[key]; const box=document.getElementById(key+'PhotosPreview');
+  if(!box) return;
+  box.innerHTML='';
+  const thumb=(src,onx)=>{
+    const d=document.createElement('div'); d.style.cssText='position:relative;';
+    const im=document.createElement('img'); im.src=src; im.alt='';
+    im.style.cssText='width:70px;height:70px;object-fit:cover;border-radius:8px;';
+    const x=document.createElement('span'); x.innerText='✕';
+    x.style.cssText='position:absolute;top:-6px;right:-6px;background:var(--maroon);color:#fff;border-radius:50%;width:20px;height:20px;text-align:center;line-height:20px;font-size:12px;cursor:pointer;';
+    x.onclick=onx;
+    d.appendChild(im); d.appendChild(x); return d;
+  };
+  st.existing.forEach((im,i)=>box.appendChild(thumb(im.url,()=>removeExistingPhoto(key,i))));
+  st.files.forEach((f,i)=>box.appendChild(thumb(f.dataUrl,()=>removeNewPhoto(key,i))));
+}
+function resetPhotoState(key){
+  photoState[key]={files:[],existing:[]};
+  const box=document.getElementById(key+'PhotosPreview'); if(box) box.innerHTML='';
+}
+function uploadPendingPhotos(key,statusElId){
+  const st=photoState[key];
+  const statusEl=statusElId?document.getElementById(statusElId):null;
+  const total=st.files.length; let done=0; const uploaded=[];
+  function next(){
+    if(done>=total) return Promise.resolve();
+    if(statusEl) statusEl.innerText=`Photos upload ho rahi hain... ${done+1}/${total}`;
+    return uploadToCloudinary(st.files[done].blob).then(r=>{ uploaded.push(r); done++; return next(); });
+  }
+  return next().then(()=>{ if(statusEl) statusEl.innerText=''; return st.existing.concat(uploaded); });
+}
+let pvImages=[], pvIndex=0;
+function openPhotoViewer(images,idx){
+  pvImages=images||[]; pvIndex=idx||0;
+  if(!pvImages.length) return;
+  updatePV();
+  document.getElementById('photoViewerModal').classList.add('active');
+}
+function updatePV(){
+  document.getElementById('pvImage').src=pvImages[pvIndex].url;
+  document.getElementById('pvCounter').innerText=(pvIndex+1)+'/'+pvImages.length;
+}
+function pvNav(d){ pvIndex=(pvIndex+d+pvImages.length)%pvImages.length; updatePV(); }
+function closePhotoViewer(){document.getElementById('photoViewerModal').classList.remove('active');}
+
+function loadMyLikes(){
+  if(myLikedPosts) return Promise.resolve(myLikedPosts);
+  return db.collection('likes').where('uid','==',auth.currentUser.uid).get().then(snap=>{
+    myLikedPosts=new Set(); snap.forEach(d=>myLikedPosts.add(d.data().postId)); return myLikedPosts;
+  }).catch(()=>{myLikedPosts=new Set();return myLikedPosts;});
+}
+function loadMySaves(){
+  if(mySavedPosts) return Promise.resolve(mySavedPosts);
+  return db.collection('saves').where('uid','==',auth.currentUser.uid).get().then(snap=>{
+    mySavedPosts=new Set(); snap.forEach(d=>mySavedPosts.add(d.data().postId)); return mySavedPosts;
+  }).catch(()=>{mySavedPosts=new Set();return mySavedPosts;});
+}
+function toggleLike(p,likeBtn){
+  if(!auth.currentUser) return;
+  const uid=auth.currentUser.uid;
+  const ref=db.collection('likes').doc(p.id+'_'+uid);
+  const postRef=db.collection('posts').doc(p.id);
+  const wasLiked=!!(myLikedPosts&&myLikedPosts.has(p.id));
+  if(wasLiked){
+    ref.delete().then(()=>{
+      if(myLikedPosts) myLikedPosts.delete(p.id);
+      p.likeCount=Math.max(0,(p.likeCount||1)-1);
+      likeBtn.innerText='🤍 '+p.likeCount;
+      postRef.update({likeCount:firebase.firestore.FieldValue.increment(-1)}).catch(()=>{});
+    }).catch(e=>alert(e.message));
+  } else {
+    ref.set({postId:p.id,uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(()=>{
+      if(myLikedPosts) myLikedPosts.add(p.id);
+      p.likeCount=(p.likeCount||0)+1;
+      likeBtn.innerText='❤️ '+p.likeCount;
+      postRef.update({likeCount:firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
+    }).catch(e=>alert(e.message));
+  }
+}
+function toggleSave(p,saveBtn){
+  if(!auth.currentUser) return;
+  const uid=auth.currentUser.uid;
+  const ref=db.collection('saves').doc(p.id+'_'+uid);
+  const wasSaved=!!(mySavedPosts&&mySavedPosts.has(p.id));
+  if(wasSaved){
+    ref.delete().then(()=>{ if(mySavedPosts) mySavedPosts.delete(p.id); saveBtn.innerText='📑'; }).catch(e=>alert(e.message));
+  } else {
+    ref.set({postId:p.id,uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(()=>{
+      if(mySavedPosts) mySavedPosts.add(p.id); saveBtn.innerText='🔖';
+    }).catch(e=>alert(e.message));
+  }
+}
+function fallbackCopy(text){
+  const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta);
+}
+function copyToClipboard(text){
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(text).catch(()=>fallbackCopy(text));
+  else fallbackCopy(text);
+}
+function postLinkFor(postId){ return location.origin+location.pathname+'?post='+postId; }
+function copyPostLink(postId){ copyToClipboard(postLinkFor(postId)); alert('Link copy ho gaya.'); }
+function sharePost(p){
+  const url=postLinkFor(p.id);
+  if(navigator.share){ navigator.share({title:p.title,text:p.title,url}).catch(()=>{}); }
+  else { copyToClipboard(url); alert('Link copy ho gaya, kahin bhi paste kar sakte hain.'); }
+}
+function openReport(postId){ reportPostId=postId; document.getElementById('reportModal').classList.add('active'); }
+function closeReportModal(){ document.getElementById('reportModal').classList.remove('active'); }
+function submitReport(){
+  const radios=document.getElementsByName('reportReason');
+  let reason='Other'; for(const r of radios) if(r.checked) reason=r.value;
+  const uid=auth.currentUser.uid;
+  db.collection('reports').doc(reportPostId+'_'+uid).set({
+    postId:reportPostId, reporterId:uid, reason, createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{ closeReportModal(); alert('Report bhej diya gaya, shukriya.'); }).catch(e=>alert(e.message));
+}
+function openComments(p){
+  commentsPostId=p.id; commentsPost=p; replyParentId=null;
+  show('commentsScreen');
+  const box=document.getElementById('commentsPostBox'); box.innerHTML='';
+  Promise.all([loadMyLikes(),loadMySaves()]).then(()=>box.appendChild(renderPostCard(p,{})));
+  document.getElementById('commentInput').placeholder='Comment likhein...';
+  document.getElementById('commentInput').value='';
+  loadComments();
+}
+function loadComments(){
+  const list=document.getElementById('commentsList');
+  list.innerHTML='<div class="empty">Loading...</div>';
+  db.collection('comments').where('postId','==',commentsPostId).get().then(snap=>{
+    const all=[]; snap.forEach(d=>all.push({id:d.id,...d.data()}));
+    all.sort((a,b)=>(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
+    const top=all.filter(c=>!c.parentId);
+    const repliesOf=pid=>all.filter(c=>c.parentId===pid);
+    if(!top.length){list.innerHTML='<div class="empty">Abhi koi comment nahi. Pehla comment aap karein!</div>';return;}
+    list.innerHTML='';
+    top.forEach(c=>{
+      list.appendChild(renderComment(c,false));
+      repliesOf(c.id).forEach(r=>list.appendChild(renderComment(r,true)));
+    });
+  }).catch(e=>{list.innerHTML='<div class="empty">'+esc(e.message)+'</div>';});
+}
+function renderComment(c,isReply){
+  const el=document.createElement('div');
+  el.className='card postcard'; if(isReply) el.style.marginLeft='28px';
+  el.innerHTML=`<div style="font-weight:700;font-size:13px;">${esc(c.authorName||'AN Community User')}</div>
+    <div style="font-size:14px;margin:4px 0;">${esc(c.text)}</div>
+    <div class="meta">${esc(formatRelTime(c.createdAt))}</div>`;
+  const row=document.createElement('div'); row.style.cssText='margin-top:4px;';
+  if(!isReply){
+    const reply=document.createElement('a'); reply.href='#'; reply.innerText='Reply karein';
+    reply.style.cssText='font-size:12px;color:var(--indigo);text-decoration:none;';
+    reply.onclick=e=>{e.preventDefault();startReply(c.id);};
+    row.appendChild(reply);
+  }
+  const isOwner=!!auth.currentUser&&c.authorId===auth.currentUser.uid;
+  if(isOwner){
+    const del=document.createElement('a'); del.href='#'; del.innerText='🗑️ Delete';
+    del.style.cssText='font-size:12px;color:var(--maroon);text-decoration:none;margin-left:14px;';
+    del.onclick=e=>{e.preventDefault(); if(confirm('Comment delete karna hai?')) deleteComment(c.id);};
+    row.appendChild(del);
+  }
+  el.appendChild(row);
+  return el;
+}
+function startReply(cid){
+  replyParentId=cid;
+  const inp=document.getElementById('commentInput');
+  inp.placeholder='Reply likhein...'; inp.focus();
+}
+function submitComment(){
+  const inp=document.getElementById('commentInput');
+  const text=inp.value.trim(); if(!text) return;
+  const parentId=replyParentId;
+  db.collection('comments').add({
+    postId:commentsPostId, parentId:parentId||null, text,
+    authorId:auth.currentUser.uid, authorName:currentName,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
+    db.collection('posts').doc(commentsPostId).update({commentCount:firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
+    if(commentsPost) commentsPost.commentCount=(commentsPost.commentCount||0)+1;
+    inp.value=''; inp.placeholder='Comment likhein...'; replyParentId=null;
+    loadComments();
+  }).catch(e=>alert(e.message));
+}
+function deleteComment(cid){
+  db.collection('comments').doc(cid).delete().then(()=>{
+    db.collection('posts').doc(commentsPostId).update({commentCount:firebase.firestore.FieldValue.increment(-1)}).catch(()=>{});
+    loadComments();
+  }).catch(e=>alert(e.message));
+}
+function openSaved(){
+  show('savedScreen');
+  const list=document.getElementById('savedList');
+  list.innerHTML='<div class="empty">Loading...</div>';
+  db.collection('saves').where('uid','==',auth.currentUser.uid).get().then(snap=>{
+    const ids=[]; snap.forEach(d=>ids.push(d.data().postId));
+    if(!ids.length){list.innerHTML='<div class="empty">Abhi koi post save nahi ki.</div>';return;}
+    Promise.all(ids.map(id=>db.collection('posts').doc(id).get())).then(docs=>{
+      const posts=docs.filter(d=>d.exists).map(d=>({id:d.id,...d.data()})).filter(x=>!x.hidden);
+      Promise.all([loadMyLikes(),loadMySaves()]).then(()=>{
+        if(!posts.length){list.innerHTML='<div class="empty">Abhi koi post save nahi ki.</div>';return;}
+        list.innerHTML='';
+        posts.forEach(pp=>list.appendChild(renderPostCard(pp,{showCategory:true})));
+      });
+    });
+  }).catch(e=>{list.innerHTML='<div class="empty">'+esc(e.message)+'</div>';});
+}
+function checkDeepLink(){
+  if(deepLinkHandled) return; deepLinkHandled=true;
+  const postId=new URLSearchParams(location.search).get('post');
+  if(!postId) return;
+  db.collection('posts').doc(postId).get().then(doc=>{
+    if(!doc.exists) return;
+    const pd={id:doc.id,...doc.data()};
+    Promise.all([loadMyLikes(),loadMySaves(),getUserInfo(pd.authorId)]).then(()=>openComments(pd));
+  }).catch(()=>{});
+}
+</script>
+</body>
+</html>
